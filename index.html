@@ -1,0 +1,349 @@
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="icon" href="/favicon.png" type="image/png">
+  <title>Tailwind CSS Blend Mode Sandbox</title>
+
+  <meta name="description" content="" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://blendmore.adamcampbell.dev" />
+  <meta property="og:title" content="Tailwind CSS Blend Mode Sandbox" />
+  <meta property="og:description" content="" />
+  <meta property="og:image" content="">
+  <meta property="twitter:card" content="summary_large_image">
+  <meta property="twitter:url" content="https://blendmore.adamcampbell.dev">
+  <meta property="twitter:title" content="Tailwind CSS Blend Mode Sandbox">
+  <meta property="twitter:description" content="">
+  <meta property="twitter:image" content="">
+
+  <link rel="stylesheet" href="https://rsms.me/inter/inter.css">
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter var', tailwind.defaultTheme.fontFamily.sans],
+          },
+          spacing: {
+            'v50': 'vh50',
+          }
+        }
+      }
+    }
+  </script>
+
+  <script>
+    window.dataLayer = window.dataLayer || [];
+
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
+    gtag('js', new Date());
+
+    gtag('config', 'G-N2HJZPYE3R');
+  </script>
+</head>
+
+
+<body class="font-sans antialiased text-gray-900 sm:h-svh">
+
+  <main id="app" class="mx-auto w-full max-w-5xl p-6 sm:p-8 lg:p-12 sm:h-svh sm:flex sm:flex-col">
+
+    <div class="max-w-2xl">
+      <h1 class="font-extrabold text-2xl sm:text-3xl lg:text-4xl tracking-tight">Tailwind CSS Blend Mode
+        Sandbox</h1>
+      <p class="mt-4 text-lg">
+        This is a sandbox for testing Tailwind CSS blend modes. The goal is to provide a visual reference for all of the
+        blend modes available in Tailwind CSS.
+      </p>
+    </div>
+
+    <div class="sm:flex-1 pt-4 sm:flex sm:flex-col mt-4 pt-4 border-t border-t-gray-300">
+      <div class="mb-6 flex flex-row items-end space-x-6">
+
+        <div>
+          <label
+            class="inline-flex text-sm font-medium px-3 py-2.5 rounded-md shadow-md border-0 hover:border-gray-600 text-gray-600 hover:text-gray-800 inline-flex items-center justify-center focus:shadow-none active:shadow-none ring-1 ring-inset ring-gray-400 focus:ring-2 focus:ring-blue-600 z-0">
+            <span>
+              Add image
+            </span>
+            <input id="upload" @change="handleFileInput" ref="fileInput" type="file" class="hidden"
+              accept="image/*, .heic" @input="form.image = $event.target.files[0]" />
+          </label>
+
+          <p class="text-xs mt-2">
+            <button v-if="imagePreview" class=" text-gray-600 underline hover:text-red-700"
+              @click="imagePreview = null">Clear</button>
+            <span v-else class="inline-block">&nbsp;</span>
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sm mb-1 font-medium text-gray-600">Background</h3>
+
+          <div class="space-x-2">
+
+            <!-- bg color picker -->
+            <div class="inline-flex relative">
+              <button
+                class="text-sm font-medium pl-3 pr-2 py-2 rounded-md shadow-md border-0 hover:border-gray-600 text-gray-600 hover:text-gray-800 inline-flex items-center justify-center focus:shadow-none active:shadow-none ring-1 ring-inset ring-gray-400 focus:ring-2 focus:ring-blue-600 z-0"
+                @click.prevent="showBgColorPicker = !showBgColorPicker" x-bind:aria-expanded="showBgColorPicker"
+                aria-haspopup="true">
+                <span class="inline-flex"> Background </span>
+                <span
+                  class="inline-flex flex-shrink-0 ml-2 ring-1 ring-inset ring-gray-800/20 rounded bg-gray-700 text-white font-mono px-1.5 py-1 text-xs">{{
+                  bgColor }}</span>
+              </button>
+
+              <div v-show="showBgColorPicker"
+                class="absolute h-64 w-64 z-10 rounded-md border bg-white border-gray-400 shadow-lg top-full left-0 mt-2 overflow-auto">
+                <div class="divide-y divide-y-gray-200 w-full rounded">
+                  <template v-for="(items, label) in colors" :key="label">
+                    <div v-if="! excludedColors.includes(label)" class="px-3 py-2 pr-6">
+                      <p class="font-mono text-sm font-medium">{{ label }}</p>
+                      <ul class="grid grid-cols-11 gap-1 mt-1">
+                        <li v-for="(color, step) in items" :key="step">
+                          <button class="h-4 w-4 block" :class="`bg-${label}-${step}`" @click="setBgColor(label, step)">
+
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- bg blend mode color -->
+            <select
+              class="inline-flex rounded-md border-0 py-2 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-400 focus:ring-2 focus:ring-blue-600 text-sm sm:leading-6 shadow-md disabled:shadow-none disabled:opacity-50 disabled:bg-gray-100 disabled:text-gray-600 disabled:cursor-not-allowed"
+              v-model="bgBlendMode" aria-label="Background blend mode" :disabled="! imagePreview">
+              <option v-for="mode in bgBlendModes" :key="mode.key" :value="mode.key">
+                {{ mode.label }}
+              </option>
+            </select>
+          </div>
+
+          <p class="mt-2 text-xs ">
+            <a class="text-blue-700 hover:underline hover:text-blue-800"
+              href="https://tailwindcss.com/docs/background-blend-mode" target="_blank">Background Blend Mode docs</a>
+          </p>
+        </div>
+
+        <!-- foreground -->
+        <div>
+          <h3 class="text-sm mb-1 font-medium text-gray-600">Foreground</h3>
+
+          <div class="space-x-2">
+            <!-- text color picker -->
+            <div class="inline-flex relative">
+              <button
+                class="text-sm font-medium pl-3 pr-2 py-2 rounded-md shadow-md border-0 hover:border-gray-600 text-gray-600 hover:text-gray-800 inline-flex items-center justify-center focus:shadow-none active:shadow-none ring-1 ring-inset ring-gray-400 focus:ring-2 focus:ring-blue-600 z-0"
+                @click.prevent="showTextColorPicker = !showTextColorPicker" x-bind:aria-expanded="showTextColorPicker"
+                aria-haspopup="true">
+                <span class="inline-flex"> Text </span>
+                <span
+                  class="inline-flex flex-shrink-0 ml-2 ring-1 ring-inset ring-gray-800/20 rounded bg-gray-700 text-white font-mono px-1.5 py-1 text-xs">{{
+                  textColor }}</span>
+              </button>
+              <div v-show="showTextColorPicker"
+                class="absolute h-64 w-64 z-10 rounded-md border bg-white border-gray-400 shadow-lg top-full left-0 mt-2 overflow-auto">
+                <div class="divide-y divide-y-gray-200 w-full rounded">
+                  <template v-for="(items, label) in colors" :key="label">
+                    <div v-if="! excludedColors.includes(label)" class="px-3 py-2 pr-6">
+                      <p class="font-mono text-sm font-medium">{{ label }}</p>
+                      <ul class="grid grid-cols-11 gap-1 mt-1">
+                        <li v-for="(color, step) in items" :key="step">
+                          <button class="h-4 w-4 block" :class="`bg-${label}-${step}`" @click="setFgColor(label, step)">
+
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </template>
+                </div>
+              </div>
+            </div>
+
+            <!-- mix blend mode -->
+            <select
+              class="inline-flex rounded-md border-0 py-2 pl-3 pr-10 text-gray-900 ring-1 ring-inset ring-gray-400 focus:ring-2 focus:ring-blue-600 text-sm sm:leading-6 shadow-md"
+              v-model="mixBlendMode">
+              <option v-for="mode in mixBlendModes" :key="mode.key" :value="mode.key">
+                {{ mode.label }}
+              </option>
+            </select>
+          </div>
+
+          <p class="mt-2 text-xs">
+            <a class="text-blue-700 hover:underline hover:text-blue-800"
+              href="https://tailwindcss.com/docs/mix-blend-mode" target="_blank">Mix Blend Mode docs</a>
+          </p>
+        </div>
+
+      </div>
+      <!-- canvas -->
+      <div
+        class="h-48 w-full ring-1 ring-inset ring-gray-800/30 rounded-lg sm:h-auto sm:flex-1 p-4 flex flex-col justify-center items-center transition-all duration-100 relative overflow-hidden">
+
+        <div class="relative z-10" :class="mixBlendMode">
+          <div class="p-4 mx-auto transition-all duration-100 rounded" :class="fgColor">
+            <div
+              class="text-7xl font-bold text-center transition-all duration-100 text-white focus:outline-none focus-within:outline-none"
+              contenteditable="true">
+              Tailwind
+            </div>
+          </div>
+        </div>
+
+        <div class="absolute inset-0 -z-10 bg-cover transition-all duration-100" :class="[bgColor, bgBlendMode]"
+          :style="imagePreview ? `background-image: url(${imagePreview});` : null">
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const {createApp, computed, mounted, ref} = Vue
+
+
+    createApp({
+      setup() {
+        const image = ref(null)
+        const bgColor = ref('bg-white')
+        const fgColor = ref('bg-black')
+        const textColor = ref('text-black')
+        const mixBlendMode = ref('mix-blend-normal')
+        const bgBlendMode = ref('bg-blend-normal')
+
+        const fileInput = ref(null)
+        const filenameLabel = ref(null)
+        const imagePreview = ref(null)
+
+        const showBgColorPicker = ref(false)
+        const showTextColorPicker = ref(false)
+
+        const excludedColors = ['inherit', 'transparent', 'current', 'lightBlue', 'warmGray', 'trueGray', 'coolGray', 'blueGray', 'black', 'white']
+        const colors = computed(() => tailwind.colors)
+
+        const bgBlendModes = [
+          {label: 'Normal', key: 'bg-blend-normal'},
+          {label: 'Multiply', key: 'bg-blend-multiply'},
+          {label: 'Screen', key: 'bg-blend-screen'},
+          {label: 'Overlay', key: 'bg-blend-overlay'},
+          {label: 'Darken', key: 'bg-blend-darken'},
+          {label: 'Lighten', key: 'bg-blend-lighten'},
+          {label: 'Color Dodge', key: 'bg-blend-color-dodge'},
+          {label: 'Color Burn', key: 'bg-blend-color-burn'},
+          {label: 'Hard Light', key: 'bg-blend-hard-light'},
+          {label: 'Soft Light', key: 'bg-blend-soft-light'},
+          {label: 'Difference', key: 'bg-blend-difference'},
+          {label: 'Exclusion', key: 'bg-blend-exclusion'},
+          {label: 'Hue', key: 'bg-blend-hue'},
+          {label: 'Saturation', key: 'bg-blend-saturation'},
+          {label: 'Color', key: 'bg-blend-color'},
+          {label: 'Luminosity', key: 'bg-blend-luminosity'},
+          {label: 'Plus Lighter', key: 'bg-blend-plus-lighter'},
+        ]
+
+        const mixBlendModes = [
+          {label: 'Normal', key: 'mix-blend-normal'},
+          {label: 'Multiply', key: 'mix-blend-multiply'},
+          {label: 'Screen', key: 'mix-blend-screen'},
+          {label: 'Overlay', key: 'mix-blend-overlay'},
+          {label: 'Darken', key: 'mix-blend-darken'},
+          {label: 'Lighten', key: 'mix-blend-lighten'},
+          {label: 'Color Dodge', key: 'mix-blend-color-dodge'},
+          {label: 'Color Burn', key: 'mix-blend-color-burn'},
+          {label: 'Hard Light', key: 'mix-blend-hard-light'},
+          {label: 'Soft Light', key: 'mix-blend-soft-light'},
+          {label: 'Difference', key: 'mix-blend-difference'},
+          {label: 'Exclusion', key: 'mix-blend-exclusion'},
+          {label: 'Hue', key: 'mix-blend-hue'},
+          {label: 'Saturation', key: 'mix-blend-saturation'},
+          {label: 'Color', key: 'mix-blend-color'},
+          {label: 'Luminosity', key: 'mix-blend-luminosity'},
+          {label: 'Plus Lighter', key: 'mix-blend-plus-lighter'},
+        ]
+
+        const setBgColor = (label, step = null) => {
+          let value = `bg-${label}`
+
+          if (step) {
+            value += `-${step}`
+          }
+
+          bgColor.value = value
+
+          showBgColorPicker.value = false
+          showTextColorPicker.value = false
+        }
+
+        const setFgColor = (label, step) => {
+          let fgValue = `bg-${label}`
+          let textValue = `text-${label}`
+
+          if (step) {
+            fgValue += `-${step}`
+            textValue += `-${step}`
+          }
+
+          fgColor.value = fgValue
+          textColor.value = textValue
+
+          showBgColorPicker.value = false
+          showTextColorPicker.value = false
+        }
+
+        const updateFilePreview = (file) => {
+          if (file) {
+            image.value = file
+
+            const reader = new FileReader()
+
+            reader.onload = (e) => {
+              imagePreview.value = e.target.result
+            }
+
+            reader.readAsDataURL(file)
+          }
+        }
+
+        const handleFileInput = (event) => {
+          const file = event.target.files[0]
+          updateFilePreview(file)
+        }
+
+        return {
+          bgColor,
+          fgColor,
+          textColor,
+          mixBlendMode,
+          bgBlendMode,
+
+          imagePreview,
+          showBgColorPicker,
+          showTextColorPicker,
+
+          excludedColors,
+          colors,
+          bgBlendModes,
+          mixBlendModes,
+
+          handleFileInput,
+          setBgColor,
+          setFgColor,
+        }
+      },
+    }).mount('#app')
+  </script>
+
+</body>
+
+</html>
